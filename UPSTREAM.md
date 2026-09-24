@@ -9,8 +9,8 @@ The weekly [upstream workflow](.github/workflows/upstream.yml) compares this SHA
 For each update:
 
 1. Read the issue's compare link and decide which changes apply to the library.
-2. Port applicable behavior and styles to Vue, preserving the 29-component API and CSS loading contract.
-3. Run `bun run check`; inspect visual changes in a Vue consumer when relevant.
+2. Port applicable behavior and styles to the single `src/<spinner>.vue` source, preserving the 29-component API and CSS loading contract in both VDOM and Vapor builds.
+3. Run `bun run check` and the Vue 3.5 package-consumer test; inspect visual changes in a Vue consumer when relevant.
 4. Advance `upstream-base` above to the reviewed upstream SHA and close the issue.
 
 To compare locally, use `git fetch upstream main` and `git diff <upstream-base> upstream/main -- src tests README.md LICENSE.md package.json`. The `upstream` remote points to `https://github.com/jakubkrehel/loading.git`.

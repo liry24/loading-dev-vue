@@ -80,8 +80,12 @@ describe("public exports", () => {
   it("exports all 29 spinners and documents them", async () => {
     expect(NAMED_SPINNERS).toEqual(SPINNERS);
     const readme = await readFile(new URL("../README.md", import.meta.url), "utf8");
-    for (const Spinner of Object.values(SPINNERS)) {
-      expect(readme).toContain(`\`${Spinner.name}\``);
+    for (const name of Object.keys(NAMED_SPINNERS)) {
+      const displayName = name
+        .split("-")
+        .map((part) => part[0].toUpperCase() + part.slice(1))
+        .join("");
+      expect(readme).toContain(`\`${displayName}\``);
     }
   });
 
