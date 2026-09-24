@@ -1,4 +1,4 @@
-import type { CSSProperties, PropType } from "vue";
+import type { CSSProperties } from "vue";
 import {
   DEFAULT_SIZE,
   DURATION_VAR,
@@ -9,13 +9,6 @@ import {
   type SpinnerName,
 } from "./motion";
 import type { SpinnerProps } from "./types";
-
-export const spinnerProps = {
-  color: String,
-  duration: Number,
-  playState: String as PropType<SpinnerProps["playState"]>,
-  size: Number,
-};
 
 export function cssVars(
   vars: CSSProperties & Record<`--ld-${string}`, string | number>,
