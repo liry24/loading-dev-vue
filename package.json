@@ -39,7 +39,7 @@
   },
   "scripts": {
     "build": "bun scripts/clean-dist.mjs && tsdown --config tsdown.config.ts && tsdown --config tsdown.vapor.config.ts",
-    "check": "bun run format:check && bun run lint && bun run unused && bun run typecheck && bun run build && bun run test",
+    "check": "bun run format:check && bun run lint && bun run unused && bun run build && bun run typecheck && bun run test",
     "dev": "tsdown --watch",
     "format": "oxfmt src tests scripts tsdown.config.ts tsdown.vapor.config.ts vitest.config.mts tsconfig.json package.json .github/workflows .vscode/extensions.json --write",
     "format:check": "oxfmt src tests scripts tsdown.config.ts tsdown.vapor.config.ts vitest.config.mts tsconfig.json package.json .github/workflows .vscode/extensions.json --check",
