@@ -8,8 +8,6 @@ export const STEP_VAR = "--ld-step";
 
 export const DEFAULT_SIZE = 20;
 
-export const SIZE = `var(${SIZE_VAR}, ${DEFAULT_SIZE}px)`;
-
 export const SPINNER_MOTION = {
   arc: 800,
   atom: 1000,
@@ -43,25 +41,3 @@ export const SPINNER_MOTION = {
 } as const satisfies Record<string, number>;
 
 export type SpinnerName = keyof typeof SPINNER_MOTION;
-
-export function duration(name: SpinnerName): string {
-  return `var(${DURATION_VAR}, ${SPINNER_MOTION[name]}ms)`;
-}
-
-export function stagger(name: SpinnerName, count: number): string {
-  return `calc(${duration(name)} * (var(${STEP_VAR}) - ${count}) / ${count})`;
-}
-
-export const PLAY_STATE = `var(${PLAY_STATE_VAR}, running)`;
-
-export function animation(
-  name: SpinnerName,
-  keyframes: string | string[],
-  timing: string
-): string {
-  const runs = [keyframes]
-    .flat()
-    .map((frames) => `${frames} ${duration(name)} ${timing} infinite`);
-  return `animation: ${runs.join(", ")};
-  animation-play-state: ${PLAY_STATE};`;
-}

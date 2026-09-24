@@ -1,0 +1,62 @@
+name: Upstream changes
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    if: github.repository == 'liry24/loading-dev-vue'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Compare upstream library files
+        id: compare
+        shell: bash
+        run: |
+          base=$(sed -n 's/^upstream-base: //p' UPSTREAM.md)
+          test -n "$base"
+          git fetch --no-tags https://github.com/jakubkrehel/loading.git main
+          head=$(git rev-parse FETCH_HEAD)
+          git diff --name-only "$base" "$head" -- src tests README.md LICENSE.md package.json > "$RUNNER_TEMP/upstream-files.txt"
+          echo "base=$base" >> "$GITHUB_OUTPUT"
+          echo "head=$head" >> "$GITHUB_OUTPUT"
+          if test -s "$RUNNER_TEMP/upstream-files.txt"; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Create or update tracking issue
+        if: steps.compare.outputs.changed == 'true'
+        uses: actions/github-script@v8
+        env:
+          BASE: ${{ steps.compare.outputs.base }}
+          HEAD: ${{ steps.compare.outputs.head }}
+        with:
+          script: |
+            const fs = require('fs');
+            const { owner, repo } = context.repo;
+            const label = 'upstream-sync';
+            try {
+              await github.rest.issues.createLabel({ owner, repo, name: label, color: '0e8a16' });
+            } catch (error) {
+              if (error.status !== 422) throw error;
+            }
+            const files = fs.readFileSync(`${process.env.RUNNER_TEMP}/upstream-files.txt`, 'utf8').trim();
+            const body = `Upstream library files changed since the last reviewed commit.\n\n` +
+              `Compare: https://github.com/jakubkrehel/loading/compare/${process.env.BASE}...${process.env.HEAD}\n\n` +
+              `Changed files:\n\n\`\`\`text\n${files}\n\`\`\`\n\n` +
+              `Port relevant changes manually. After verification, update \`upstream-base\` in UPSTREAM.md and close this issue.`;
+            const issues = await github.paginate(github.rest.issues.listForRepo, { owner, repo, state: 'open', labels: label });
+            const issue = issues.find(item => !item.pull_request);
+            if (issue) {
+              await github.rest.issues.update({ owner, repo, issue_number: issue.number, body });
+            } else {
+              await github.rest.issues.create({ owner, repo, title: 'Review upstream loading.dev changes', body, labels: [label] });
+            }

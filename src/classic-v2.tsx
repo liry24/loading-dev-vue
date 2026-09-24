@@ -1,5 +1,4 @@
-import { SpinnerStyle, spinnerRoot, step } from "./frame";
-import { animation, SIZE, stagger } from "./motion";
+import { spinnerProps, spinnerRoot, step } from "./frame";
 import type { SpinnerProps } from "./types";
 
 const TICKS = [
@@ -13,55 +12,16 @@ const TICKS = [
   "M2.34315 3.28594C2.0828 3.02559 2.0828 2.60348 2.34315 2.34314C2.6035 2.08279 3.02561 2.08279 3.28596 2.34313L5.17158 4.22875C5.43193 4.4891 5.43193 4.91121 5.17158 5.17156C4.91123 5.43191 4.48912 5.43191 4.22877 5.17156L2.34315 3.28594Z",
 ];
 
-const css = `
-.ld-classic-v2 {
-  width: ${SIZE};
-  height: ${SIZE};
-}
-
-.ld-classic-v2-tick {
-  ${animation("classic-v2", "ld-classic-v2-fade", "linear")}
-  animation-delay: ${stagger("classic-v2", TICKS.length)};
-}
-
-@keyframes ld-classic-v2-fade {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.4;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ld-classic-v2-tick {
-    opacity: 0.5;
-    animation: none;
-  }
-}
-`;
-
 export function ClassicV2(props: SpinnerProps) {
   return (
-    <>
-      <SpinnerStyle name="classic-v2">{css}</SpinnerStyle>
-      <svg
-        {...spinnerRoot("classic-v2", props)}
-        fill="none"
-        role="presentation"
-        viewBox="0 0 16 16"
-      >
-        <g fill="currentColor">
-          {TICKS.map((d, tick) => (
-            <path
-              className="ld-classic-v2-tick"
-              d={d}
-              key={d}
-              style={step(tick)}
-            />
-          ))}
-        </g>
-      </svg>
-    </>
+    <svg {...spinnerRoot("classic-v2", props)} fill="none" role="presentation" viewBox="0 0 16 16">
+      <g fill="currentColor">
+        {TICKS.map((d, tick) => (
+          <path class="ld-classic-v2-tick" d={d} key={d} style={step(tick)} />
+        ))}
+      </g>
+    </svg>
   );
 }
+
+ClassicV2.props = { ...spinnerProps };
