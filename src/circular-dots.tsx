@@ -1,5 +1,4 @@
-import { SpinnerStyle, spinnerRoot, step } from "./frame";
-import { animation, SIZE, stagger } from "./motion";
+import { spinnerProps, spinnerRoot, step } from "./frame";
 import type { SpinnerProps } from "./types";
 
 const DOTS = [
@@ -13,55 +12,26 @@ const DOTS = [
   [3.4038, 3.4038],
 ] as const;
 
-const css = `
-.ld-circular-dots {
-  width: ${SIZE};
-  height: ${SIZE};
-}
-
-.ld-circular-dots-dot {
-  ${animation("circular-dots", "ld-circular-dots-fade", "linear")}
-  animation-delay: ${stagger("circular-dots", DOTS.length)};
-}
-
-@keyframes ld-circular-dots-fade {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0.2;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ld-circular-dots-dot {
-    opacity: 0.6;
-    animation: none;
-  }
-}
-`;
-
 export function CircularDots(props: SpinnerProps) {
   return (
-    <>
-      <SpinnerStyle name="circular-dots">{css}</SpinnerStyle>
-      <svg
-        {...spinnerRoot("circular-dots", props)}
-        fill="currentColor"
-        role="presentation"
-        viewBox="0 0 16 16"
-      >
-        {DOTS.map(([cx, cy], index) => (
-          <circle
-            className="ld-circular-dots-dot"
-            cx={cx}
-            cy={cy}
-            key={`${cx}-${cy}`}
-            r="1.5"
-            style={step(index)}
-          />
-        ))}
-      </svg>
-    </>
+    <svg
+      {...spinnerRoot("circular-dots", props)}
+      fill="currentColor"
+      role="presentation"
+      viewBox="0 0 16 16"
+    >
+      {DOTS.map(([cx, cy], index) => (
+        <circle
+          class="ld-circular-dots-dot"
+          cx={cx}
+          cy={cy}
+          key={`${cx}-${cy}`}
+          r="1.5"
+          style={step(index)}
+        />
+      ))}
+    </svg>
   );
 }
+
+CircularDots.props = { ...spinnerProps };

@@ -1,61 +1,63 @@
 {
-  "name": "loading-dev",
-  "version": "0.3.4",
-  "description": "A lightweight library full of beautiful loading indicators for React.",
+  "name": "loading-dev-vue",
+  "version": "0.1.0",
+  "description": "Beautiful loading indicators for Vue 3.",
   "keywords": [
-    "react",
-    "spinner",
-    "loading",
+    "indicator",
     "loader",
-    "indicator"
+    "loading",
+    "spinner",
+    "vue"
   ],
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jakubkrehel/loading.git"
+    "url": "git+https://github.com/liry24/loading-dev-vue.git"
   },
-  "license": "MIT",
-  "sideEffects": false,
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "browser": "./dist/index.mjs",
+      "node": "./dist/index.node.mjs",
+      "import": "./dist/index.mjs"
+    }
+  },
   "scripts": {
-    "build": "tsup",
-    "build:web": "pnpm --filter web build",
-    "dev": "pnpm run \"/^dev:/\"",
-    "dev:lib": "tsup --watch src",
-    "dev:web": "pnpm --filter web dev",
-    "fix": "biome check --write .",
-    "format": "biome format --write .",
-    "lint": "biome check .",
-    "prepublishOnly": "tsup",
+    "build": "tsdown",
+    "check": "bun run format:check && bun run lint && bun run unused && bun run typecheck && bun run test && bun run build",
+    "dev": "tsdown --watch",
+    "format": "oxfmt src tests tsdown.config.ts vitest.config.mts tsconfig.json package.json .github/workflows .vscode/extensions.json --write",
+    "format:check": "oxfmt src tests tsdown.config.ts vitest.config.mts tsconfig.json package.json .github/workflows .vscode/extensions.json --check",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint . --fix",
+    "prepack": "bun run build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit && pnpm build && pnpm --filter web typecheck"
+    "typecheck": "tsc --noEmit",
+    "unused": "knip"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.13",
+    "@tsdown/css": "^0.23.0",
     "@types/node": "^24.13.3",
-    "@types/react": "^19",
-    "@types/react-dom": "^19.2.4",
-    "react": "19.2.6",
-    "react-dom": "19.2.6",
-    "tsup": "^8.5.0",
-    "typescript": "^5",
-    "ultracite": "^7.11.1",
-    "vitest": "^4.1.11"
+    "knip": "^6.37.0",
+    "oxfmt": "^0.69.0",
+    "oxlint": "^1.84.0",
+    "tsdown": "^0.23.0",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11",
+    "vue": "^3.5.0"
   },
   "peerDependencies": {
-    "react": ">=19.0.0",
-    "react-dom": ">=19.0.0"
+    "vue": ">=3.5.0"
   },
-  "packageManager": "pnpm@11.8.0"
+  "packageManager": "bun@1.4.2"
 }

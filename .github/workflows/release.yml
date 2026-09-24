@@ -1,22 +1,93 @@
-name: release
+name: Release
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [main]
+  pull_request:
+    types: [closed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      npm-tag:
+        description: npm dist-tag override
+        required: false
+        default: ""
+
+permissions: {}
 
 jobs:
-  publish:
+  pr:
+    if: github.repository == 'liry24/loading-dev-vue' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: bootstrap
+        run: |
+          if git rev-parse -q --verify refs/tags/v0.1.0 >/dev/null; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.bootstrap.outputs.ready == 'true'
+        uses: danielroe/uppt/pr@09882a5a0a1a20a0e802613a77ad59fcb1c1611c # v0.6.9
+        with:
+          checkout: "false"
+          allow-forks: "true"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  release:
+    if: |
+      github.repository == 'liry24/loading-dev-vue'
+      && github.event_name == 'pull_request'
+      && github.event.pull_request.merged == true
+      && startsWith(github.event.pull_request.head.ref, 'release/v')
+      && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: danielroe/uppt/release@09882a5a0a1a20a0e802613a77ad59fcb1c1611c # v0.6.9
+        with:
+          allow-forks: "true"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  pack:
+    if: github.repository == 'liry24/loading-dev-vue' && github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
+    outputs:
+      files: ${{ steps.pack.outputs.files }}
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
-      - run: npm install --global npm@latest
-      - run: pnpm install --frozen-lockfile --filter loading-dev
-      - run: npm publish
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      - run: bun ci --ignore-scripts
+      - id: pack
+        uses: danielroe/uppt/pack@09882a5a0a1a20a0e802613a77ad59fcb1c1611c # v0.6.9
+        with:
+          checkout: "false"
+          install: "false"
+
+  publish:
+    if: github.repository == 'liry24/loading-dev-vue' && github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/v') && needs.pack.outputs.files != '[]'
+    needs: pack
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      id-token: write
+    steps:
+      - uses: danielroe/uppt/publish@09882a5a0a1a20a0e802613a77ad59fcb1c1611c # v0.6.9
+        with:
+          files: ${{ needs.pack.outputs.files }}
+          npm-tag: ${{ inputs.npm-tag }}

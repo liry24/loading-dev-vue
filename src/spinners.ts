@@ -1,4 +1,4 @@
-import type { ComponentType } from "react";
+import type { FunctionalComponent } from "vue";
 import { Arc } from "./arc";
 import { Atom } from "./atom";
 import { Blocks } from "./blocks";
@@ -61,4 +61,4 @@ export const SPINNERS = {
   swirl: Swirl,
   trace: Trace,
   wave: Wave,
-} satisfies Record<SpinnerName, ComponentType<SpinnerProps>>;
+} satisfies Record<SpinnerName, FunctionalComponent<SpinnerProps>>;
